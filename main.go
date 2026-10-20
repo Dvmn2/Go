@@ -2,19 +2,18 @@ package main
 
 import (
 	"fmt"
-	"strconv"
+	"math"
 )
+
+const s = "const"
 
 // test
 func main() {
-	var a = "hiiii"
-	var b = 2
-	var c int = 5
+	fmt.Println(s)
 
-	a = "Hi"
-
-	f := ", 2 + 2 = "
-
-	fmt.Println(a + f + strconv.Itoa((b + c)))
+	const a = 50000
+	const b = 3e20 / a
+	fmt.Println(int64(b))
+	fmt.Println(math.Sin(a))
 
 }
