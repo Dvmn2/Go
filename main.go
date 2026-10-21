@@ -1,49 +1,43 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
+import "fmt"
 
 func main() {
 
-	i := 2
-	fmt.Print("Write ", i, " as ")
-	switch i {
-	case 1:
-		fmt.Println("one")
-	case 2:
-		fmt.Println("two")
-	case 3:
-		fmt.Println("three")
-	}
+	var a [5]int
+	fmt.Println("emp:", a)
 
-	switch time.Now().Weekday() {
-	case time.Saturday, time.Sunday:
-		fmt.Println("It's the weekend")
-	default:
-		fmt.Println("It's a weekday")
-	}
+	a[4] = 100
+	fmt.Println("set:", a)
+	fmt.Println("get:", a[4])
 
-	t := time.Now()
-	switch {
-	case t.Hour() < 12:
-		fmt.Println("It's before noon")
-	default:
-		fmt.Println("It's after noon")
-	}
+	fmt.Println("len:", len(a))
 
-	whatAmI := func(i any) {
-		switch t := i.(type) {
-		case bool:
-			fmt.Println("I'm a bool")
-		case int:
-			fmt.Println("I'm an int")
-		default:
-			fmt.Printf("Don't know type %T\n", t)
+	b := [5]int{1, 2, 3, 4, 5}
+	fmt.Println("dcl:", b)
+
+	b = [...]int{1, 2, 3, 4, 5}
+	fmt.Println("dcl:", b)
+
+	b = [...]int{100, 3: 400, 500}
+	fmt.Println("idx:", b)
+
+	// wtf 3: 400 ?
+	c := [...]int{3: 400}
+	fmt.Println("idx:", c)
+	fmt.Println([...]int{2: 2, 2})
+
+	var twoD [2][3]int
+	for i := range 2 {
+		for j := range 3 {
+			twoD[i][j] = i + j
 		}
 	}
-	whatAmI(true)
-	whatAmI(1)
-	whatAmI("hey")
+	fmt.Println("2d: ", twoD)
+
+	twoD = [2][3]int{
+		{1, 2, 3},
+		{1, 2, 3},
+	}
+	fmt.Println("2d: ", twoD)
 }
