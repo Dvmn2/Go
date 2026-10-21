@@ -2,46 +2,33 @@ package main
 
 import "fmt"
 
-type person struct {
-	name string
-	age  int
+type rect struct {
+	width, height int
 }
 
-func newPerson(name string) *person {
+func (r *rect) area() int {
+	r.height++
+	return r.width * r.height
+}
 
-	p := person{name: name}
-	p.age = 42
-	return &p
+func (r rect) perim() int {
+	r.height--
+	return 2*r.width + 2*r.height
 }
 
 func main() {
+	r := rect{width: 10, height: 5}
+	fmt.Println("r:", r)
 
-	fmt.Println(person{"Bob", 20})
+	fmt.Println("area: ", r.area())
+	fmt.Println("r:", r)
+	fmt.Println("perim:", r.perim())
+	fmt.Println("r:", r)
 
-	fmt.Println(person{name: "Alice", age: 30})
-
-	fmt.Println(person{name: "Fred"})
-
-	fmt.Println(&person{name: "Ann", age: 40})
-
-	fmt.Println(newPerson("Jon"))
-
-	s := person{name: "Sean", age: 50}
-	fmt.Println(s.name)
-
-	s.age = 51
-	fmt.Println(s)
-
-	sp := &s
-	sp.age = 52
-	fmt.Println(sp.age)
-
-	dog := struct {
-		name   string
-		isGood bool
-	}{
-		"Rex",
-		true,
-	}
-	fmt.Println(dog)
+	rp := &r
+	fmt.Println("rp:", rp)
+	fmt.Println("area: ", rp.area())
+	fmt.Println("rp:", rp)
+	fmt.Println("perim:", rp.perim())
+	fmt.Println("rp:", rp)
 }
