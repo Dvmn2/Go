@@ -2,46 +2,43 @@ package main
 
 import "fmt"
 
-type ServerState int
-
-const (
-	StateIdle ServerState = iota
-	StateConnected
-	StateError
-	StateRetrying
-)
-
-var stateName = map[ServerState]string{
-	StateIdle:      "idle",
-	StateConnected: "connected",
-	StateError:     "error",
-	StateRetrying:  "retrying",
+func fib(c int) []int {
+	a := 0
+	b := 1
+	c -= 2
+	array := []int{0, 1}
+	for i := 0; i < c; i++ {
+		t := a
+		a = b
+		b = a + t
+		array = append(array, b)
+	}
+	return array
 }
 
-func (ss ServerState) String() string {
-	return stateName[ss]
+func fib_rec(array []int, c int) []int {
+	if c == 0 {
+		return array
+	}
+	if len(array) == 0 {
+		array = []int{0, 1}
+		c -= 2
+	} else if len(array) == 1 {
+		array = append(array, 1)
+		c--
+	}
+	array = append(array, array[len(array)-1]+array[len(array)-2])
+	c--
+	return fib_rec(array, c)
 }
 
 func main() {
-	ns := transition(StateIdle)
-	fmt.Println(ns)
-
-	ns2 := transition(ns)
-	fmt.Println(ns2)
-}
-
-func transition(s ServerState) ServerState {
-	switch s {
-	case StateIdle:
-		return StateConnected
-
-	case StateConnected, StateRetrying:
-		return StateIdle
-
-	case StateError:
-		return StateError
-
-	default:
-		panic(fmt.Errorf("unknown state: %s", s))
-	}
+	c := 0
+	fmt.Println("Enter count:")
+	fmt.Scan(&c)
+	array := fib(c)
+	fmt.Printf("array: %v\n", array)
+	array = []int{}
+	array = fib_rec(array, c)
+	fmt.Printf("array: %v\n", array)
 }
