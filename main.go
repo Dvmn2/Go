@@ -1,44 +1,49 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
-func fib(c int) []int {
-	a := 0
-	b := 1
-	c -= 2
-	array := []int{0, 1}
-	for i := 0; i < c; i++ {
-		t := a
-		a = b
-		b = a + t
-		array = append(array, b)
+func l1(n int, m int) [][]int {
+	array := make([][]int, n)
+	for i := range n {
+		array[i] = make([]int, m)
 	}
+
+	for i := range n {
+		fmt.Printf("Enter %d row: ", i)
+		for j := range m {
+			fmt.Scan(&array[i][j])
+		}
+	}
+
 	return array
 }
 
-func fib_rec(array []int, c int) []int {
-	if c == 0 {
-		return array
+func l2(n int, m int) [][]int {
+	array := make([][]int, n)
+	for i := range n {
+		array[i] = make([]int, m)
 	}
-	if len(array) == 0 {
-		array = []int{0, 1}
-		c -= 2
-	} else if len(array) == 1 {
-		array = append(array, 1)
-		c--
+
+	for i := range n {
+		for j := range m {
+			array[i][j] = rand.Intn(50)*2 + (i+j)%2
+		}
 	}
-	array = append(array, array[len(array)-1]+array[len(array)-2])
-	c--
-	return fib_rec(array, c)
+
+	return array
 }
 
 func main() {
-	c := 0
-	fmt.Println("Enter count:")
-	fmt.Scan(&c)
-	array := fib(c)
+	n, m := 0, 0
+	fmt.Println("Enter n and m:")
+	fmt.Scan(&n)
+	fmt.Scan(&m)
+
+	array := l1(n, m)
 	fmt.Printf("array: %v\n", array)
-	array = []int{}
-	array = fib_rec(array, c)
+	array = l2(n, m)
 	fmt.Printf("array: %v\n", array)
 }
