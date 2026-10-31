@@ -1,49 +1,53 @@
 package main
 
-import (
-	"fmt"
-	"math/rand"
-)
+import "fmt"
 
-func l1(n int, m int) [][]int {
-	array := make([][]int, n)
-	for i := range n {
-		array[i] = make([]int, m)
-	}
-
-	for i := range n {
-		fmt.Printf("Enter %d row: ", i)
-		for j := range m {
-			fmt.Scan(&array[i][j])
+func SlicesIndex[S ~[]E, E comparable](s S, v E) int {
+	for i := range s {
+		if v == s[i] {
+			return i
 		}
 	}
-
-	return array
+	return -1
 }
 
-func l2(n int, m int) [][]int {
-	array := make([][]int, n)
-	for i := range n {
-		array[i] = make([]int, m)
-	}
+type List[T any] struct {
+	head, tail *element[T]
+}
 
-	for i := range n {
-		for j := range m {
-			array[i][j] = rand.Intn(50)*2 + (i+j)%2
-		}
-	}
+type element[T any] struct {
+	next *element[T]
+	val  T
+}
 
-	return array
+func (lst *List[T]) Push(v T) {
+	if lst.tail == nil {
+		lst.head = &element[T]{val: v}
+		lst.tail = lst.head
+	} else {
+		lst.tail.next = &element[T]{val: v}
+		lst.tail = lst.tail.next
+	}
+}
+
+func (lst *List[T]) AllElements() []T {
+	var elems []T
+	for e := lst.head; e != nil; e = e.next {
+		elems = append(elems, e.val)
+	}
+	return elems
 }
 
 func main() {
-	n, m := 0, 0
-	fmt.Println("Enter n and m:")
-	fmt.Scan(&n)
-	fmt.Scan(&m)
+	var s = []string{"foo", "bar", "zoo"}
 
-	array := l1(n, m)
-	fmt.Printf("array: %v\n", array)
-	array = l2(n, m)
-	fmt.Printf("array: %v\n", array)
+	fmt.Println("index of zoo:", SlicesIndex(s, "zoo"))
+
+	_ = SlicesIndex[[]string, string](s, "zoo")
+
+	lst := List[int]{}
+	lst.Push(10)
+	lst.Push(13)
+	lst.Push(23)
+	fmt.Println("list:", lst.AllElements())
 }
