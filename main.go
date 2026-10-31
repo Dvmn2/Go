@@ -1,53 +1,56 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-func SlicesIndex[S ~[]E, E comparable](s S, v E) int {
-	for i := range s {
-		if v == s[i] {
-			return i
-		}
-	}
-	return -1
-}
-
-type List[T any] struct {
+type Vector[T any] struct {
 	head, tail *element[T]
 }
 
 type element[T any] struct {
-	next *element[T]
-	val  T
+	next, prev *element[T]
+	val        T
 }
 
-func (lst *List[T]) Push(v T) {
-	if lst.tail == nil {
-		lst.head = &element[T]{val: v}
-		lst.tail = lst.head
+func (a *Vector[T]) Pull(val T) {
+	e := &element[T]{val: val}
+	if a.head == nil {
+		a.head = e
+		a.tail = e
 	} else {
-		lst.tail.next = &element[T]{val: v}
-		lst.tail = lst.tail.next
+		e.prev = a.tail
+		a.tail.next = e
+		a.tail = e
 	}
 }
 
-func (lst *List[T]) AllElements() []T {
-	var elems []T
-	for e := lst.head; e != nil; e = e.next {
-		elems = append(elems, e.val)
+func (a *Vector[T]) Put(val T) {
+	e := &element[T]{val: val}
+	if a.head == nil {
+		a.head = e
+		a.tail = e
+	} else {
+		e.next = a.head
+		a.head.prev = e
+		a.head = e
 	}
-	return elems
+}
+
+func (a *Vector[T]) String() string {
+	var s strings.Builder
+	for i := a.head; i != nil; i = i.next {
+		s.WriteString(fmt.Sprint(i.val))
+		s.WriteString(" ")
+	}
+	return s.String()
 }
 
 func main() {
-	var s = []string{"foo", "bar", "zoo"}
-
-	fmt.Println("index of zoo:", SlicesIndex(s, "zoo"))
-
-	_ = SlicesIndex[[]string, string](s, "zoo")
-
-	lst := List[int]{}
-	lst.Push(10)
-	lst.Push(13)
-	lst.Push(23)
-	fmt.Println("list:", lst.AllElements())
+	vector := &Vector[int]{}
+	vector.Pull(1)
+	vector.Pull(2)
+	vector.Put(0)
+	fmt.Println(vector) // 0 1 2
 }
