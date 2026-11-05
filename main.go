@@ -2,55 +2,76 @@ package main
 
 import (
 	"fmt"
+	"iter"
+	"slices"
 	"strings"
 )
 
-type Vector[T any] struct {
+type List[T any] struct {
 	head, tail *element[T]
 }
 
 type element[T any] struct {
-	next, prev *element[T]
-	val        T
+	next *element[T]
+	val  T
 }
 
-func (a *Vector[T]) Pull(val T) {
-	e := &element[T]{val: val}
-	if a.head == nil {
-		a.head = e
-		a.tail = e
+func (lst *List[T]) Push(v T) {
+	if lst.tail == nil {
+		lst.head = &element[T]{val: v}
+		lst.tail = lst.head
 	} else {
-		e.prev = a.tail
-		a.tail.next = e
-		a.tail = e
+		lst.tail.next = &element[T]{val: v}
+		lst.tail = lst.tail.next
 	}
 }
 
-func (a *Vector[T]) Put(val T) {
-	e := &element[T]{val: val}
-	if a.head == nil {
-		a.head = e
-		a.tail = e
-	} else {
-		e.next = a.head
-		a.head.prev = e
-		a.head = e
+func (lst *List[T]) All() iter.Seq[T] {
+	return func(yield func(T) bool) {
+
+		for e := lst.head; e != nil; e = e.next {
+			if !yield(e.val) {
+				return
+			}
+		}
 	}
 }
 
-func (a *Vector[T]) String() string {
-	var s strings.Builder
-	for i := a.head; i != nil; i = i.next {
-		s.WriteString(fmt.Sprint(i.val))
-		s.WriteString(" ")
+func genFib() iter.Seq[int] {
+	return func(yield func(int) bool) {
+		a, b := 0, 1
+
+		for {
+			if !yield(a) {
+				return
+			}
+			a, b = b, a+b
+		}
 	}
-	return s.String()
 }
 
 func main() {
-	vector := &Vector[int]{}
-	vector.Pull(1)
-	vector.Pull(2)
-	vector.Put(0)
-	fmt.Println(vector) // 0 1 2
+	lst := List[int]{}
+	lst.Push(10)
+	lst.Push(13)
+	lst.Push(23)
+
+	for e := range lst.All() {
+		fmt.Println(e)
+	}
+
+	all := slices.Collect(lst.All())
+	fmt.Println("all:", all)
+
+	for part := range strings.SplitSeq("go-by-example", "-") {
+		fmt.Printf("part: %s\n", part)
+	}
+
+	for n := range genFib() {
+
+		if n >= 10 {
+			break
+		}
+		fmt.Println(n)
+	}
 }
