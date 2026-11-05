@@ -1,112 +1,55 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"iter"
-	"strings"
 )
 
-type Vector[T any] struct {
-	head, tail *element[T]
-}
+func f(arg int) (int, error) {
+	if arg == 42 {
 
-type element[T any] struct {
-	next, prev *element[T]
-	val        T
-}
-
-func (a *Vector[T]) Pull(val T) {
-	e := &element[T]{val: val}
-	if a.head == nil {
-		a.head = e
-		a.tail = e
-	} else {
-		e.prev = a.tail
-		a.tail.next = e
-		a.tail = e
+		return -1, errors.New("can't work with 42")
 	}
+
+	return arg + 3, nil
 }
 
-func (a *Vector[T]) Put(val T) {
-	e := &element[T]{val: val}
-	if a.head == nil {
-		a.head = e
-		a.tail = e
-	} else {
-		e.next = a.head
-		a.head.prev = e
-		a.head = e
-	}
-}
+var ErrOutOfTea = errors.New("no more tea available")
+var ErrPower = errors.New("can't boil water")
 
-func (a *Vector[T]) String() string {
-	var s strings.Builder
-	for i := a.head; i != nil; i = i.next {
-		s.WriteString(fmt.Sprint(i.val))
-		s.WriteString(" ")
-	}
-	return s.String()
-}
+func makeTea(arg int) error {
+	if arg == 2 {
+		return ErrOutOfTea
+	} else if arg == 4 {
 
-func (vec *Vector[T]) Elements() iter.Seq[T] {
-	return func(yield func(T) bool) {
-		for e := vec.head; e != nil; e = e.next {
-			if !yield(e.val) {
-				return
-			}
-		}
+		return fmt.Errorf("making tea: %w", ErrPower)
 	}
-}
-
-func Squaring() iter.Seq[int] {
-	return func(yield func(int) bool) {
-		a := 1
-		for {
-			if !yield(a) {
-				return
-			}
-			a *= 2
-		}
-	}
-}
-
-func Squaring2() iter.Seq2[int, int] {
-	return func(yield func(int, int) bool) {
-		a := 1
-		for i := 0; ; i++ {
-			if !yield(i, a) {
-				return
-			}
-			a *= 2
-		}
-	}
+	return nil
 }
 
 func main() {
-	vector := &Vector[int]{}
-	vector.Pull(1)
-	vector.Pull(2)
-	vector.Put(0)
+	for _, i := range []int{7, 42} {
 
-	for n := range vector.Elements() {
-		fmt.Println(n)
+		if r, e := f(i); e != nil {
+			fmt.Println("f failed:", e)
+		} else {
+			fmt.Println("f worked:", r)
+		}
 	}
 
-	fmt.Println("---")
+	for i := range 5 {
+		if err := makeTea(i); err != nil {
 
-	for n := range Squaring() {
-		if n >= 10 {
-			break
+			if errors.Is(err, ErrOutOfTea) {
+				fmt.Println("We should buy new tea!")
+			} else if errors.Is(err, ErrPower) {
+				fmt.Println("Now it is dark.")
+			} else {
+				fmt.Printf("unknown error: %s\n", err)
+			}
+			continue
 		}
-		fmt.Println(n)
-	}
 
-	fmt.Println("---")
-
-	for n, v := range Squaring2() {
-		if n >= 10 {
-			break
-		}
-		fmt.Println(v)
+		fmt.Println("Tea is ready!")
 	}
 }
