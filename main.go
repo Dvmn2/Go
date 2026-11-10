@@ -1,26 +1,13 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
-
-func f(from string) {
-	for i := range 3 {
-		fmt.Println(from, ":", i)
-	}
-}
+import "fmt"
 
 func main() {
 
-	f("direct")
+	messages := make(chan string)
 
-	go f("goroutine")
+	go func() { messages <- "ping" }()
 
-	go func(msg string) {
-		fmt.Println(msg)
-	}("going")
-
-	time.Sleep(time.Second)
-	fmt.Println("done")
+	msg := <-messages
+	fmt.Println(msg)
 }
