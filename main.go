@@ -4,10 +4,11 @@ import "fmt"
 
 func main() {
 
-	messages := make(chan string)
+	messages := make(chan string, 2)
 
-	go func() { messages <- "ping" }()
+	messages <- "buffered"
+	messages <- "channel"
 
-	msg := <-messages
-	fmt.Println(msg)
+	fmt.Println(<-messages)
+	fmt.Println(<-messages)
 }
