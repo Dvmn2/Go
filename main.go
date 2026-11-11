@@ -1,33 +1,26 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
-	jobs := make(chan int, 5)
-	done := make(chan bool)
 
+	timer1 := time.NewTimer(2 * time.Second)
+
+	<-timer1.C
+	fmt.Println("Timer 1 fired")
+
+	timer2 := time.NewTimer(time.Second)
 	go func() {
-		for {
-			j, more := <-jobs
-			if more {
-				fmt.Println("received job", j)
-			} else {
-				fmt.Println("received all jobs")
-				done <- true
-				return
-			}
-		}
+		<-timer2.C
+		fmt.Println("Timer 2 fired")
 	}()
-
-	for j := 1; j <= 3; j++ {
-		jobs <- j
-		fmt.Println("sent job", j)
+	stop2 := timer2.Stop()
+	if stop2 {
+		fmt.Println("Timer 2 stopped")
 	}
-	close(jobs)
-	fmt.Println("sent all jobs")
 
-	<-done
-
-	_, ok := <-jobs
-	fmt.Println("received more jobs:", ok)
+	time.Sleep(2 * time.Second)
 }
