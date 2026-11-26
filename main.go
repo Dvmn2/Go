@@ -2,29 +2,42 @@ package main
 
 import (
 	"fmt"
-	"math/rand/v2"
-	"sync"
 	"time"
 )
 
-func worker(id int) {
-	fmt.Printf("Worker %d starting\n", id)
-
-	time.Sleep(time.Duration(rand.IntN(5)) * time.Second)
-	fmt.Printf("Worker %d done\n", id)
-}
-
 func main() {
-
-	var wg sync.WaitGroup
-
+	requests := make(chan int, 5)
 	for i := 1; i <= 5; i++ {
-		wg.Go(func() {
-			worker(i)
-		})
+		requests <- i
+	}
+	close(requests)
+
+	limiter := time.Tick(200 * time.Microsecond)
+
+	for req := range requests {
+		<-limiter
+		fmt.Println("request", req, time.Now())
 	}
 
-	wg.Wait()
-	fmt.Printf("Done")
+	burstyLimiter := make(chan time.Time, 3)
 
+	for range 3 {
+		burstyLimiter <- time.Now()
+	}
+
+	go func() {
+		for t := range time.Tick(200 * time.Millisecond) {
+			burstyLimiter <- t
+		}
+	}()
+
+	burstyRequests := make(chan int, 5)
+	for i := 1; i <= 5; i++ {
+		burstyRequests <- i
+	}
+	close(burstyRequests)
+	for req := range burstyRequests {
+		<-burstyLimiter
+		fmt.Println("request", req, time.Now())
+	}
 }
