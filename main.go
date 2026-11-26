@@ -3,34 +3,28 @@ package main
 import (
 	"fmt"
 	"math/rand/v2"
+	"sync"
 	"time"
 )
 
-func worker(id int, jobs <-chan int, results chan<- int) {
-	for j := range jobs {
-		fmt.Println("worker", id, "started  job", j)
-		time.Sleep(time.Duration(rand.IntN(5)) * time.Second)
-		fmt.Println("worker", id, "finished job", j)
-		results <- j * 2
-	}
+func worker(id int) {
+	fmt.Printf("Worker %d starting\n", id)
+
+	time.Sleep(time.Duration(rand.IntN(5)) * time.Second)
+	fmt.Printf("Worker %d done\n", id)
 }
 
 func main() {
 
-	const numJobs = 5
-	jobs := make(chan int, numJobs)
-	results := make(chan int, numJobs)
+	var wg sync.WaitGroup
 
-	for w := 1; w <= 3; w++ {
-		go worker(w, jobs, results)
+	for i := 1; i <= 5; i++ {
+		wg.Go(func() {
+			worker(i)
+		})
 	}
 
-	for j := 1; j <= numJobs; j++ {
-		jobs <- j
-	}
-	close(jobs)
+	wg.Wait()
+	fmt.Printf("Done")
 
-	for a := 1; a <= numJobs; a++ {
-		<-results
-	}
 }
